@@ -9,12 +9,12 @@ const sendEmail = async(to,subject,text)=>{
     secure:true,
     port:465,
     auth:{
-      user:"ffooggoo6@gmail.com",
-      pass:"fzju idoi jttt rudb"
+      user:process.env.EMAIL,
+      pass:process.env.PASS
     }
   })
   const mailOptions = {
-    from:`kalpanatmg101@gmail.com`,
+    from:process.env.EMAIL,
     to,
     subject,
     text
