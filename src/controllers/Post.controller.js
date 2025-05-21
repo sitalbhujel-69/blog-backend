@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Post } from "../models/Post.model.js";
 
 const createPost = async (req,res)=>{
@@ -24,7 +25,28 @@ const createPost = async (req,res)=>{
 
 const getPosts = async (req,res)=>{
   try {
-    const posts = await Post.find();
+    const posts = await Post.aggregate([
+      {
+        $lookup:{
+          from:"likes",
+          localField:"_id",
+          foreignField:"post",
+          as:"likes"
+        }
+      },{
+        $addFields:{
+          likecount:{$size:"$likes"}
+        }
+      },{
+        $project:{
+          title:1,
+          content:1,
+          Photo:1,
+          owner:1,
+          likecount:1
+        }
+      }
+    ])
     return res.status(200).json({message:"posts fetched successfully",posts})
   } catch (error) {
     console.error(error)
@@ -35,8 +57,34 @@ const getPosts = async (req,res)=>{
 const getPostById = async (req,res)=>{
   const {id} = req.params;
   try {
-    const posts = await Post.findById(id);
-    if(!posts){
+    const posts = await Post.aggregate([
+      {
+        $match:{
+          _id:new mongoose.Types.ObjectId(id)
+        }
+      }, 
+      {
+        $lookup:{
+          from:"likes",
+          localField:"_id",
+          foreignField:"post",
+          as:"likes"
+        }
+      },{
+        $addFields:{
+          likecount:{$size:"$likes"}
+        }
+      },{
+        $project:{
+          title:1,
+          content:1,
+          Photo:1,
+          owner:1,
+          likecount:1
+        }
+      }
+    ])
+    if(!posts.length){
       return res.status(404).json({message:"posts Not found"})
     }
     return res.status(200).json({message:"Post fetched successfully",posts})
