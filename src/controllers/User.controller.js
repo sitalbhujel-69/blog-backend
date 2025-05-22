@@ -2,7 +2,6 @@ import { User } from "../models/User.model.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../utils/jwt.js";
 import { sendEmail } from "../utils/sendEmail.js";
-import e from "express";
 
 const registerUser = async (req, res) => {
   try {
