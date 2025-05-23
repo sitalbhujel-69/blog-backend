@@ -1,4 +1,6 @@
 import { Comment } from "../models/Comment.model.js";
+import { Notification } from "../models/notification.model.js";
+import { Post } from "../models/Post.model.js";
 
 const postComment = async (req,res)=>{
   const {postId} = req.params;
@@ -10,7 +12,14 @@ const postComment = async (req,res)=>{
       user:userId,
       post:postId
     })
-    return res.status(200).json({message:"successfully commented!",comment})
+    const post = await Post.findById(postId);
+    const notification = await Notification.create({
+      type:"comment",
+      sender:userId,
+      receiver:post.owner,
+      post:postId
+    })
+    return res.status(200).json({message:"successfully commented!",comment,notification})
   } catch (error) {
     return res.status(500).json({message:"something went wrong while trying to comment"})
   }
