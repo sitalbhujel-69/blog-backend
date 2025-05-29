@@ -30,16 +30,18 @@ const userSchema = new Schema({
   }
 })
 
-userSchema.pre('save',async function(next){
-  if(!this.isModified('password')) return next();
-  if(!this.isModified('otp') || !this.otp) next();
+userSchema.pre('save', async function (next) {
+  
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
 
-  const hashedPassword = await bcrypt.hash(this.password,10);
+  if (this.isModified('otp') && this.otp) {
+    this.otp = await bcrypt.hash(this.otp, 10);
+  }
 
-  const hashedOTP = await bcrypt.hash(this.otp,10)
-  this.password = hashedPassword;
-  this.otp = hashedOTP
-  next()
-})
+  next();
+});
+
 
 export const User = mongoose.model('User',userSchema)

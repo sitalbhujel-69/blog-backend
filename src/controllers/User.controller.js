@@ -132,7 +132,7 @@ const createNewPassword = async (req,res)=>{
      user.password = newPassword
      user.otp = undefined
      user.otpExpiry = undefined
-     await user.save();
+     await user.save({validateBeforeSave:false});
       return res.status(200).json({message:"password changed!",data:user})
     }
     return res.status(400).json({message:"password doesnot match"})
